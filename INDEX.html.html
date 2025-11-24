@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tool Inventory Tracking System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- 1. AESTHETIC & VIBE: Classic Professional Light Mode --- */
+        :root {
+            /* New Color Palette */
+            --color-base-light: #EFECE3; /* Dominant Base (Cream) */
+            --color-primary-accent: #4A70A9; /* Deep Blue (Primary Action) */
+            --color-secondary-accent: #8FABD4; /* Soft Blue (Borders/Secondary) */
+            --color-text-primary: #000000; /* True Black */
+            --color-card-bg: #ffffff; /* Crisp White for card surfaces */
+            --color-border-subtle: #DDDDDD; /* Light gray for internal borders */
+            --color-error: #D9534F; /* Red for deletion */
+
+            /* Typography */
+            --font-family-primary: 'Inter', 'SF Pro Display', 'Roboto', Arial, sans-serif;
+            
+            /* Spacing & UX */
+            --spacing-gap: 24px;
+            --border-radius-base: 8px;
+            --touch-target-min: 48px;
+        }
+
+        /* Base Body Style */
+        body { 
+            font-family: var(--font-family-primary); 
+            margin: 0;
+            padding: var(--spacing-gap);
+            background: var(--color-base-light); /* Cream Base */
+            color: var(--color-text-primary);
+            line-height: 1.6;
+        }
+
+        h1, h2 { 
+            text-align: left;
+            color: var(--color-primary-accent); /* Deep Blue Headings */
+            border-bottom: 2px solid var(--color-secondary-accent); /* Soft Blue line */
+            padding-bottom: 10px;
+            margin-bottom: var(--spacing-gap);
+            font-weight: 700; 
+        }
+        
+        /* --- Form Organization Improvement: Two-Column Grid --- */
+        .form-container {
+            background-color: var(--color-card-bg);
+            border: 1px solid var(--color-border-subtle);
+            padding: var(--spacing-gap);
+            border-radius: var(--border-radius-base);
+            margin-bottom: var(--spacing-gap);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); /* Soft shadow */
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-gap);
+        }
+
+        /* Ensure input elements fill the grid column */
+        .form-grid > * {
+            width: 100%;
+        }
+
+        /* Image and final button go across both columns */
+        #imagePreview, #toolPicture, .form-container button {
+            grid-column: 1 / -1;
+        }
+
+        /* --- 2. LAYOUT & STRUCTURE: Grid & Cards --- */
+        #inventory {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: var(--spacing-gap);
+            margin-top: 10px;
+        }
+
+        .tool-card {
+            background: var(--color-card-bg);
+            border: 1px solid var(--color-secondary-accent); /* Soft Blue Border */
+            padding: var(--spacing-gap);
+            border-radius: var(--border-radius-base);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08); 
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        /* Hover State */
+        .tool-card:hover {
+            transform: translateY(-3px); 
+            box-shadow: 0 8px 20px rgba(74, 112, 169, 0.2); /* Deep Blue Shadow */
+            cursor: default;
+        }
+
+        /* --- 3. TYPOGRAPHY & VISUAL ELEMENTS --- */
+        .tool-card h3 {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--color-primary-accent);
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        .tool-card b {
+            color: var(--color-text-primary);
+            font-weight: 700;
+        }
+
+        /* --- FIX: Standardized Image Size for Inventory Cards --- */
+        .tool-card img { 
+            width: 200px; /* Fixed width */
+            height: 200px; /* Fixed height */
+            object-fit: cover; /* Ensures image covers the area without stretching */
+            display: block; 
+            margin: 15px 0;
+            border: 1px solid var(--color-border-subtle);
+            border-radius: var(--border-radius-base);
+        }
+        /* --- END FIX --- */
+        
+        /* The preview image remains small */
+        #imagePreview {
+             max-width: 150px; 
+             height: auto;
+             object-fit: contain;
+        }
+
+        /* --- 4. INTERACTIVITY & UX FOCUS: Inputs & Buttons --- */
+
+        /* Input Fields */
+        input:not([type="file"]), select {
+            margin: 0; /* Managed by form-grid gap */
+            width: 100%; 
+            padding: 12px 15px; 
+            box-sizing: border-box;
+            border: 1px solid var(--color-secondary-accent); /* Soft Blue Border */
+            border-radius: var(--border-radius-base);
+            background-color: var(--color-base-light); /* Cream input background */
+            color: var(--color-text-primary);
+            font-size: 1em;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            min-height: var(--touch-target-min);
+        }
+
+        /* Input Focus State */
+        input:focus, select:focus {
+            border-color: var(--color-primary-accent);
+            outline: none;
+            box-shadow: 0 0 8px rgba(74, 112, 169, 0.3);
+            background-color: var(--color-card-bg); /* White on focus */
+        }
+
+        #searchBar {
+            max-width: 400px;
+            margin-bottom: var(--spacing-gap);
+            display: block;
+        }
+
+        /* Primary Button */
+        button { 
+            padding: 12px; 
+            margin-top: 15px; 
+            cursor: pointer; 
+            width: 100%;
+            border: none;
+            border-radius: var(--border-radius-base);
+            background-color: var(--color-primary-accent); /* Deep Blue */
+            color: var(--color-base-light); /* Cream Text */
+            font-weight: 700;
+            font-size: 1.05em;
+            transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+            min-height: var(--touch-target-min);
+        }
+
+        /* Primary Button Hover State */
+        button:hover { 
+            background-color: #3B5A87; /* Slightly darker hover */
+            transform: translateY(-1px);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Delete Button */
+        button[onclick*="deleteTool"] { 
+            background-color: var(--color-error); /* Red */
+            color: var(--color-card-bg);
+        }
+
+        button[onclick*="deleteTool"]:hover {
+            background-color: #C9302C;
+        }
+
+        /* Status Badges */
+        .status-badge { 
+            padding: 4px 8px; 
+            border-radius: 4px; 
+            font-weight: bold;
+            font-size: 0.8em;
+            text-transform: uppercase;
+        }
+
+        /* Status Colors - Using Deep Blue for positive, Red for negative */
+        .Good { 
+            background: var(--color-primary-accent); 
+            color: var(--color-base-light);
+        }
+        .Cracked { 
+            background: var(--color-secondary-accent); 
+            color: var(--color-text-primary);
+        }
+        .Damaged, .Bad { 
+            background: var(--color-error); 
+            color: var(--color-card-bg);
+        }
+        .NeedsRepair { 
+            background: #FFC107; /* Standard Yellow for warning */
+            color: var(--color-text-primary);
+        }
+
+        /* Modal Styling */
+        .modal {
+            /* Existing modal styles (ensure they cover the screen) */
+            display: none; /* Hidden by default */
+            position: fixed; 
+            z-index: 1; 
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto; 
+            background-color: rgba(0,0,0,0.6);
+        }
+        
+        .modal-content {
+            background-color: var(--color-card-bg);
+            margin: 15% auto; /* 15% from the top and centered */
+            padding: 20px;
+            border: 1px solid var(--color-secondary-accent);
+            width: 80%; /* Could be adjusted */
+            max-width: 600px;
+            color: var(--color-text-primary);
+            border-radius: var(--border-radius-base);
+        }
+
+        .close {
+            color: var(--color-text-primary);
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus { 
+            color: var(--color-primary-accent); 
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        #fullHistory div {
+            border-bottom: 1px dashed var(--color-border-subtle);
+            padding: 8px 0;
+            font-size: 0.9em;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <h1>Tool Inventory Tracking System</h1>
+
+    <div class="form-container">
+        <h2>Add a Tool</h2>
+        <div class="form-grid">
+            <input id="toolName" placeholder="Tool Name">
+            <input id="toolQty" type="number" placeholder="Quantity">
+            <input id="toolLocation" placeholder="Location (Shelf, Box, etc)">
+            <select id="toolStatus">
+                <option value="Good">Good</option>
+                <option value="Cracked">Cracked</option>
+                <option value="Damaged">Damaged</option>
+                <option value="NeedsRepair">Needs Repair</option>
+                <option value="Bad">Bad</option>
+            </select>
+            <input id="toolPicture" type="file" accept="image/*" onchange="previewImage(event)">
+            <img id="imagePreview" src="https://via.placeholder.com/150" alt="Image Preview" style="max-width:150px; display:block; margin-top:5px; border-radius:5px;">
+        </div>
+        <button onclick="addTool()">Add Tool to Inventory</button>
+    </div>
+
+    <h2>Inventory</h2>
+    <input id="searchBar" placeholder="Search tools..." onkeyup="render()">
+    <div id="inventory"></div>
+
+    <div id="historyModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeHistory()">&times;</span>
+            <h3>Full Tool History</h3>
+            <div id="fullHistory"></div>
+        </div>
+    </div>
+
+    <script>
+        let tools = JSON.parse(localStorage.getItem("tools") || "[]");
+
+        function save() { 
+            localStorage.setItem("tools", JSON.stringify(tools)); 
+        }
+
+        function previewImage(event) {
+            const preview = document.getElementById("imagePreview");
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) { preview.src = e.target.result; };
+                reader.readAsDataURL(file);
+            } else {
+                preview.src = 'https://via.placeholder.com/150';
+            }
+        }
+
+        function clearForm() {
+            document.getElementById("toolName").value = "";
+            document.getElementById("toolQty").value = "";
+            document.getElementById("toolLocation").value = "";
+            document.getElementById("toolStatus").value = "Good";
+            document.getElementById("toolPicture").value = "";
+            document.getElementById("imagePreview").src = 'https://via.placeholder.com/150';
+        }
+
+        // Add Tool
+        function addTool() {
+            let name = document.getElementById("toolName").value.trim();
+            let qty = parseInt(document.getElementById("toolQty").value);
+            let location = document.getElementById("toolLocation").value.trim();
+            let status = document.getElementById("toolStatus").value;
+            let file = document.getElementById("toolPicture").files[0];
+
+            if (!name || !qty || qty <= 0 || !location) {
+                alert("Please fill all required fields with valid values!");
+                return;
+            }
+
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                tools.push({
+                    id: Date.now(),
+                    name,
+                    qty,
+                    location,
+                    picture: e.target.result || 'https://via.placeholder.com/150',
+                    status,
+                    checkedOut: 0,
+                    history: []
+                });
+                save();
+                render();
+                clearForm();
+            };
+            if (file) reader.readAsDataURL(file);
+            else reader.onload({ target: { result: 'https://via.placeholder.com/150' } });
+        }
+
+        // PDF Invoice - MODIFIED to add Watermark
+        function generateInvoice(tool, type, who, qty = 1) {
+            const { jsPDF } = window.jspdf;
+            
+            // Set document size to A5 (148mm x 210mm)
+            const doc = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a5' 
+            });
+            
+            // A5 Dimensions
+            const docWidth = 148;
+            const docHeight = 210;
+            const margin = 10;
+            const contentWidth = docWidth - (2 * margin);
+            
+            // Colors and Titles
+            const accentColor = '#4A70A9'; // Deep Blue
+            const headerColor = '#EFECE3'; // Cream
+            const textColor = '#000000'; // Black
+            const invoiceTitle = type === "out" ? "BON DE SORTIE (CHECK-OUT)" : "BON D'ENTRÉE (RETURN)";
+
+            let y = margin; // Start content y position
+
+            // --- Header Block (Accent Background) ---
+            doc.setFillColor(accentColor);
+            doc.rect(0, 0, docWidth, 20, 'F'); // Header height reduced to 20mm
+            doc.setFont('Inter', 'bold');
+            doc.setFontSize(16);
+            doc.setTextColor(headerColor);
+            doc.text("INVENTORY MOVEMENT NOTE", docWidth / 2, 13, { align: 'center' });
+            
+            // --- Watermark (Must be added before other content to avoid covering it) ---
+            doc.saveGraphicsState(); // Save current state
+            doc.setFillColor(200, 200, 200); // Light gray color
+            doc.setTextColor(200, 200, 200); // Light gray text color
+            doc.setFontSize(40);
+            doc.setFont('Inter', 'bold');
+
+            // Rotate and position for a diagonal watermark (A5 center is roughly 74, 105)
+            doc.text("INVENTORY COPY", docWidth / 2, docHeight / 2, { 
+                angle: 45, 
+                align: 'center', 
+                baseline: 'middle' 
+            });
+            doc.restoreGraphicsState(); // Restore original state (important for colors/font/etc.)
+            // --- End Watermark ---
+
+            // --- Title and Date (Standard Content) ---
+            y = 30; // Start content lower down
+            doc.setFont('Inter', 'bold');
+            doc.setFontSize(12);
+            doc.setTextColor(textColor);
+            doc.text(invoiceTitle, margin, y);
+            
+            doc.setFont('Inter', 'normal');
+            doc.setFontSize(8);
+            doc.text(`Date of Operation: ${new Date().toLocaleString()}`, docWidth - margin, y, { align: 'right' });
+            
+            y += 4;
+            doc.setDrawColor(textColor);
+            doc.line(margin, y, docWidth - margin, y); // Separator line
+
+            // --- Tool Details and Image Section ---
+            y += 5;
+            const startYDetails = y; // Save start Y for alignment
+
+            // Left Column (Details)
+            doc.setFont('Inter', 'bold');
+            doc.setFontSize(10);
+            doc.setTextColor(textColor);
+            doc.text("TOOL DETAILS:", margin, y);
+            
+            y += 5;
+            doc.setFont('Inter', 'normal');
+            doc.setFontSize(9);
+            doc.text(`Name: ${tool.name}`, margin, y);
+            y += 5;
+            doc.text(`Quantity Moved: ${qty}`, margin, y);
+            y += 5;
+            doc.text(`Total Qty in Stock (Before): ${tool.qty + (type === "out" ? qty : -qty)}`, margin, y);
+            y += 5;
+            doc.text(`Current Available Stock: ${tool.qty - tool.checkedOut}`, margin, y);
+            y += 5;
+            doc.text(`Current Condition: ${tool.status}`, margin, y);
+            y += 5;
+            doc.text(`Location: ${tool.location}`, margin, y);
+
+
+            // Right Column (Image) - starts at the same Y as details header
+            const imageX = docWidth / 2 + 5;
+            const imageY = startYDetails;
+            const imageSize = 40; // Fixed size for the image (40mm x 40mm)
+            
+            // Only add image if it's not the placeholder
+            if (tool.picture && tool.picture !== 'https://via.placeholder.com/150') {
+                try {
+                    // This is for demonstration. In a real app, you might need to handle CORS/image loading
+                    doc.addImage(tool.picture, 'JPEG', imageX, imageY, imageSize, imageSize, undefined, 'FAST');
+                } catch (e) {
+                    // Fallback text if image fails to load/is invalid format for jsPDF
+                    doc.text("Tool Image Placeholder", imageX, imageY + (imageSize / 2), { align: 'center' });
+                }
+            } else {
+                 doc.setFontSize(8);
+                 doc.setFont('Inter', 'italic');
+                 doc.text("No image provided for this tool.", imageX, imageY + 5);
+            }
+
+
+            // --- Personnel and Signature Section ---
+            y = Math.max(y + 10, startYDetails + imageSize + 10); // Ensure we are below both details and image
+
+            doc.setFont('Inter', 'bold');
+            doc.setFontSize(10);
+            doc.text("MOVEMENT PERSONNEL:", margin, y);
+            
+            y += 5;
+            doc.setFont('Inter', 'normal');
+            doc.setFontSize(9);
+            doc.text(`Personnel Involved: ${who || "N/A"}`, margin, y);
+            
+            // --- Footer / Signature Block ---
+            const signatureY = docHeight - 30;
+            doc.setDrawColor(textColor);
+            
+            // Line for Personnel Signature (Left)
+            doc.line(margin, signatureY, margin + contentWidth / 2 - 5, signatureY);
+            doc.setFontSize(8);
+            doc.text("Personnel Signature", margin + (contentWidth / 4) - 2.5, signatureY + 3, { align: 'center' });
+            
+            // Line for Inventory Manager Signature (Right)
+            doc.line(docWidth / 2 + 5, signatureY, docWidth - margin, signatureY);
+            doc.text("Inventory Manager Signature", docWidth - margin - (contentWidth / 4) + 2.5, signatureY + 3, { align: 'center' });
+            
+            doc.save(`${tool.name}_${type}_${new Date().getTime()}.pdf`);
+        }
+        // End of PDF Invoice Improvement
+
+        // Check Out, Return Tool, Edit Tool, Delete Tool functions remain the same
+        function checkOut(id) {
+            let tool = tools.find(t => t.id === id);
+            let who = prompt("Who is taking this tool?");
+            if (!who) return;
+
+            let maxQty = tool.qty - tool.checkedOut;
+            if (maxQty <= 0) { alert("No available units left!"); return; }
+
+            let qty = parseInt(prompt(`How many units to check out? Max: ${maxQty}`, 1));
+            if (!qty || qty <= 0 || qty > maxQty) { alert("Invalid quantity"); return; }
+
+            tool.checkedOut += qty;
+            tool.history.push({ type: "out", who, date: new Date().toLocaleString(), qty });
+            save();
+            generateInvoice(tool, "out", who, qty);
+            render();
+        }
+
+        function returnTool(id) {
+            let tool = tools.find(t => t.id === id);
+            if (tool.checkedOut <= 0) { alert("No units to return!"); return; }
+
+            let who = prompt("Who is returning this tool?");
+            if (!who) return;
+
+            let qty = parseInt(prompt(`How many units to return? Max: ${tool.checkedOut}`, 1));
+            if (!qty || qty <= 0 || qty > tool.checkedOut) { alert("Invalid quantity"); return; }
+
+            let condition = prompt("Condition of the tool (Good, Bad, Cracked, etc):", tool.status);
+            tool.checkedOut -= qty;
+            tool.status = condition || tool.status;
+
+            tool.history.push({ type: "in", who, date: new Date().toLocaleString(), condition: tool.status, qty });
+            save();
+            generateInvoice(tool, "in", who, qty);
+            render();
+        }
+
+        function editTool(id) {
+            let tool = tools.find(t => t.id === id);
+            let name = prompt("Tool Name:", tool.name);
+            if (!name) return;
+            let qty = parseInt(prompt("Quantity:", tool.qty));
+            if (!qty || qty <= 0) return;
+            let location = prompt("Location:", tool.location);
+            if (!location) return;
+            let status = prompt("Status (Good, Cracked, Damaged, NeedsRepair, Bad):", tool.status);
+            if (!status) return;
+
+            tool.name = name;
+            tool.qty = qty;
+            tool.location = location;
+            tool.status = status;
+            save();
+            render();
+        }
+
+        function deleteTool(id) {
+            if (!confirm("Are you sure you want to delete this tool?")) return;
+            tools = tools.filter(t => t.id !== id);
+            save();
+            render();
+        }
+
+        function showHistory(id) {
+            let tool = tools.find(t => t.id === id);
+            let container = document.getElementById("fullHistory");
+            container.innerHTML = tool.history.length === 0 ? "No history yet" :
+                tool.history.map(h => `<div style="color: ${h.type === 'out' ? '#4A70A9' : '#8FABD4'}">
+                    <b>${h.type === "out" ? "CHECKED OUT" : "RETURNED"}:</b> ${h.date} 
+                    by ${h.who} | Qty: ${h.qty} 
+                    ${h.condition ? `| Condition: ${h.condition}` : ""}
+                </div>`).join("");
+            document.getElementById("historyModal").style.display = "block";
+        }
+
+        function closeHistory() { 
+            document.getElementById("historyModal").style.display = "none"; 
+        }
+
+        function render() {
+            let container = document.getElementById("inventory");
+            container.innerHTML = "";
+            let search = document.getElementById("searchBar").value.toLowerCase();
+
+            let filteredTools = tools.filter(tool => {
+                return (
+                    tool.name.toLowerCase().includes(search) ||
+                    tool.location.toLowerCase().includes(search) ||
+                    tool.status.toLowerCase().includes(search) ||
+                    tool.history.some(h => (h.who || "").toLowerCase().includes(search))
+                );
+            });
+
+            filteredTools.forEach(tool => {
+                let div = document.createElement("div");
+                div.className = "tool-card";
+
+                const availableQty = tool.qty - tool.checkedOut;
+
+                div.innerHTML = `
+                    <h3>${tool.name}</h3>
+                    <img src="${tool.picture}" alt="Image of ${tool.name}">
+                    <p><b>Total Quantity:</b> ${tool.qty}</p>
+                    <p><b>Available:</b> <span style="font-weight:bold; color: ${availableQty > 0 ? 'var(--color-primary-accent)' : 'var(--color-error)'};">${availableQty}</span></p>
+                    <p><b>Checked Out:</b> ${tool.checkedOut}</p>
+                    <p><b>Location:</b> ${tool.location}</p>
+                    <p><b>Status:</b> <span class="status-badge ${tool.status}">${tool.status}</span></p>
+                    <button onclick="checkOut(${tool.id})">Check Out</button>
+                    <button onclick="returnTool(${tool.id})">Return</button>
+                    <button onclick="editTool(${tool.id})">Edit</button>
+                    <button onclick="deleteTool(${tool.id})" style="background-color: var(--color-error);">Delete</button>
+                    <button onclick="showHistory(${tool.id})">Full History</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+        render();
+    </script>
+</body>
+</html>
